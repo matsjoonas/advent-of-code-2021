@@ -8,7 +8,11 @@ class AocSuite {
 
   constructor(config: any) {
     this.solver = config.solver;
-    this.inputPath = config.inputPath;
+    if (config.inputPath.charAt(0) !== '.') {
+      this.inputPath = __dirname + '/' + config.inputPath;
+    } else {
+      this.inputPath = config.inputPath;
+    }
   }
 
   solve(log: boolean = false): number | string {
