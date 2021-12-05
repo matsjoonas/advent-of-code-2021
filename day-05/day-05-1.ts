@@ -1,32 +1,37 @@
 type Point = [number, number];
-type Segment = [Point, Point, number];
+type Segment = [Point, Point];
 
 const isDiagonal = function isDiagonal(line: Segment): boolean {
   return line[0][0] !== line[1][0] && line[0][1] !== line[1][1];
 }
 
-/*
-const arePerpendicular = function arePerpendicular(a: Segment, b: Segment): boolean {
-  if (a[0][1] === b[])
+const isVertical = function isVertical(segment: Segment): boolean {
+  return segment[0][0] === segment[1][0];
 }
 
-const getOverlaps = function getOverlaps(a: Segment, b: Segment): Segment[] {
-
+const isHorizontal = function isHorizontal(segment: Segment): boolean {
+  return segment[0][1] === segment[1][1];
 }
 
-const orderPoints
+const convertSegmentToPoints = function convertSegmentToPoints(segment: Segment): number[][] {
+  const points = [];
+  const pointA = segment[0];
+  const pointB = segment[1];
+  // y is same and x is hanging
+  if (isHorizontal(segment)) {
+    for (let i = pointA[0]; i <= pointB[0]; i++) {
+      points.push([i, pointA[1]]);
+    }
+  } else {
+    // x is the same and y is changing
+    for (let i = pointA[1]; i <= pointB[1]; i++) {
+      points.push([pointA[0], i]);
+    }
+  }
 
-const rateSegments = function rateSegments(segments: Segment[]): Segment[] {
-  const ratedSegments: number[][][] = [];
-
-  segments.forEach((segment, index) => {
-    // foreach ratedSegment
-    // take the segment out
-    // split into intersections
-    // put back in the rated segments
-  });
+  return points;
 }
-*/
+
 const day051 = function day051(data: Buffer) {
   const input = data.toString().trim()
     .split('\r\n')
@@ -46,25 +51,29 @@ const day051 = function day051(data: Buffer) {
         return a[1] - b[1];
       });
 
-      return [sortedPoints[0], sortedPoints[1], 0];
+      return [sortedPoints[0], sortedPoints[1]];
     })
     .filter(segment => !isDiagonal(segment));
 
 
 
-  const ratedSegments = [];
-  console.log(input);
+  const allPoints = input.map(segment => {
+    return convertSegmentToPoints(segment);
+  }).flat();
+  const pointsMap = new Map();
+  allPoints.forEach(point => {
+    const key = String(point[0]) + ',' + String(point[1]);
 
-  // keys x and y
-  // [0,9] [] [1]
-  // y9 [0, 5, 1]
-  // discard diagonals
-  // y4 [9, 3]
-  // x2 [2, 1]
-  // y9 [0, 2]
-
-
-  return input;
+    const duplicateCount = pointsMap.get(key);
+    if (duplicateCount === undefined) {
+      pointsMap.set(key, 0);
+    } else {
+      pointsMap.set(key, duplicateCount + 1);
+    }
+  });
+  
+  const duplicates =  [...pointsMap].filter(point => point[1] > 0);
+  return duplicates.length;
 }
 
 export default day051;
