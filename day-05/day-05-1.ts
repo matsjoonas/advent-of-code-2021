@@ -71,7 +71,7 @@ const day051 = function day051(data: Buffer) {
       pointsMap.set(key, duplicateCount + 1);
     }
   });
-  
+
   const duplicates =  [...pointsMap].filter(point => point[1] > 0);
   return duplicates.length;
 }
