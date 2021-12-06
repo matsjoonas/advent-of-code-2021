@@ -5,7 +5,7 @@ const day061 = function day061(data: Buffer) {
 
   let currentCycle = input;
   let nextCycle: number[] = [];
-  let days = 256;
+  let days = 80;
   for (let i = 0; i < days; i++) {
     nextCycle = [];
     currentCycle.forEach(fish => {
