@@ -17,11 +17,20 @@ class AocSuite {
 
   solve(log: boolean = false): number | string {
     const data = fs.readFileSync(this.inputPath);
+    let startStamp = 0;
+    let endStamp = 0;
+    startStamp = Date.now();
     const answer = this.solver(data);
+    endStamp = Date.now();
     if (log) {
       console.log('__________________________________'.blue);
       console.log('The answer is: ')
       console.log(answer);
+
+      const totalTime = endStamp - startStamp;
+      console.log('__________________________________'.blue);
+      console.log('Execution time in ms:')
+      console.log(totalTime)
     }
     return answer;
   }
