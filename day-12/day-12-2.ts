@@ -78,7 +78,7 @@ const day122 = function day122(data: Buffer) {
 
     paths = workingPaths;
   }
-  
+
   return paths.length;
 }
 
