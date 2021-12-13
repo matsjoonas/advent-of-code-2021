@@ -9,6 +9,6 @@ describe('day-13-1', () => {
       inputPath: 'day-13/tests/test-inputs/test-input-1.txt'
     });
 
-    expect(suite.solve()).toBe(10);
+    expect(suite.solve()).toBe(17);
   });
 });
