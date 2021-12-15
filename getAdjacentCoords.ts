@@ -1,14 +1,22 @@
-const getAdjacentCoords = function getAdjacentCoords(x: number, y: number): number[][] {
-  return [
+const getAdjacentCoords = function getAdjacentCoords(x: number, y: number, mode: string = 'diagonal'): number[][] {
+  let points = [
     [x, y - 1],
-    [x + 1, y - 1],
     [x + 1, y],
-    [x + 1, y + 1],
     [x, y + 1],
-    [x - 1, y + 1],
     [x - 1, y],
-    [x - 1, y - 1],
   ];
+
+  if (mode === 'diagonal') {
+    points = [
+      ...points,
+      [x + 1, y - 1],
+      [x + 1, y + 1],
+      [x - 1, y + 1],
+      [x - 1, y - 1],
+    ]
+  }
+
+  return points;
 }
 
 
