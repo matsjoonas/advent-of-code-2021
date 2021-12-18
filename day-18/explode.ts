@@ -1,23 +1,19 @@
 import Direction from "./Direction";
 import isNumber from "./isNumber";
 import findNumber from "./findNumber";
+import iterateOverSnailfishNumber from "./iterateOverSnailfishNumber";
 
 const explode = function explode(origArr: (string | number)[]) {
   const arr = [...origArr];
-
-  let level: string[] = [];
+  
   let newArr: (string | number)[] = [...arr];
   let haveExplodedPair = false;
-  for (let i = 0; i < arr.length; i++) {
+  iterateOverSnailfishNumber(arr, (arr: (string | number)[], i: number, level: number) => {
     const char = arr[i];
-    if (char === '[') {
-      level.push(char);
-    } else if (char === ']') {
-      level.pop();
-    } else if (isNumber(char)) {
+    if (isNumber(char)) {
       const nextChar1 = arr[i + 1];
       const nextChar2 = arr[i + 2];
-      if (nextChar1 === ',' && isNumber(nextChar2) && level.length === 5 && !haveExplodedPair) {
+      if (nextChar1 === ',' && isNumber(nextChar2) && level === 5 && !haveExplodedPair) {
         // we'e found a pair that needs exploding
         const a = char;
         const b = nextChar2;
@@ -39,7 +35,7 @@ const explode = function explode(origArr: (string | number)[]) {
         haveExplodedPair = true;
       }
     }
-  }
+  });
 
   return {
     arr: newArr,

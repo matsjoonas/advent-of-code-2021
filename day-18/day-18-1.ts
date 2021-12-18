@@ -1,12 +1,19 @@
-import explode from "./explode";
-import split from "./split";
+import parseSnailfishNumber from "./parseSnailfishNumber";
+import magnitude from "./magnitude";
+import addSnailfishNumbers from "./addSnailfishNumbers";
 
 const day181 = function day181(data: Buffer) {
   const input = data.toString().trim()
-    .split('\r\n');
+    .split('\r\n').map(line => parseSnailfishNumber(line));
+  const result = input.reduce((acc, cur) => {
+    if (!acc.length) {
+      return cur;
+    }
+    return addSnailfishNumbers(acc, cur);
+  }, []);
 
-  
-  return null;
+  console.log(result.join(''));
+  return magnitude(JSON.parse(result.join('')));
 }
 
 export default day181;
