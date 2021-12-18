@@ -5,7 +5,7 @@ import addSnailfishNumbers from "./addSnailfishNumbers";
 const day182 = function day182(data: Buffer) {
   const input = data.toString().trim()
     .split('\r\n').map(line => parseSnailfishNumber(line));
-  
+
   const inputA = [...input];
   const inputB = [...input];
   const magnitudes: number[] = [];
