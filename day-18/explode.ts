@@ -37,6 +37,7 @@ const explode = function explode(str: string) {
 
         // replace the original pair with 0
         newArr = [...newArr.slice(0, i - 1), 0, ...newArr.slice(i + 4)];
+        haveExplodedPair = true;
       }
     }
   }
