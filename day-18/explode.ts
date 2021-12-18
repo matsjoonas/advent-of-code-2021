@@ -1,13 +1,12 @@
 import Direction from "./Direction";
 import isNumber from "./isNumber";
 import findNumber from "./findNumber";
-import tryToConvertToNumber from "./tryToConvertToNumber";
 
-const explode = function explode(str: string) {
-  const arr = str.split('').map(char => tryToConvertToNumber(char));
+const explode = function explode(origArr: (string | number)[]) {
+  const arr = [...origArr];
 
-  let level = [];
-  let newArr = [...arr];
+  let level: string[] = [];
+  let newArr: (string | number)[] = [...arr];
   let haveExplodedPair = false;
   for (let i = 0; i < arr.length; i++) {
     const char = arr[i];
@@ -42,7 +41,10 @@ const explode = function explode(str: string) {
     }
   }
 
-  return newArr;
+  return {
+    arr: newArr,
+    hasExploded: haveExplodedPair,
+  }
 };
 
 export default explode;
