@@ -12,7 +12,6 @@ const day181 = function day181(data: Buffer) {
     return addSnailfishNumbers(acc, cur);
   }, []);
 
-  console.log(result.join(''));
   return magnitude(JSON.parse(result.join('')));
 }
 
