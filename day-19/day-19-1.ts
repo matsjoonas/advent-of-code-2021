@@ -18,81 +18,62 @@ const day191 = function day191(data: Buffer) {
     }
   });
 
-  const commonPoints: {
-    scannerA: any;
-    scannerB: any;
-    scannerIndexA: number; scannerIndexB: number; sharedPoints: string[][]; }[] = [];
-  const scannersWithMeta = scanners.map((scanner, index) => ({
-    scanner,
-    aligned: index === 0,
-  }));
+  const parsedScanners: ({ points: number[][]; index: number; } | undefined)[] = [];
 
-  let scannerWithMetaIndexA = 0;
-  while (scannersWithMeta.length > 1) {
-    const scannerWithMetaA = scannersWithMeta.shift();
-
-    scannersWithMeta.forEach((scannerWithMetaB, scannerWithMetaIndexB) => {
-      let scannerA: { scanner: number[][]; aligned: boolean };
-      let scannerB: { scanner: number[][]; aligned: boolean };
-      let scannerIndexA: number;
-      let scannerIndexB: number;
+  const pairs: {
       // @ts-ignore
+      indexA: number; indexB: number; offset: string;
+  }[] = [];
 
-      if (scannerWithMetaA.aligned) {
-        // @ts-ignore
-        scannerA = scannerWithMetaA;
-        scannerB = scannerWithMetaB;
-        scannerIndexA = scannerWithMetaIndexA;
-        scannerIndexB = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
-      } else if (scannerWithMetaB.aligned) {
-        scannerA = scannerWithMetaB;
-        // @ts-ignore
-        scannerB = scannerWithMetaA;
-        scannerIndexA = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
-        scannerIndexB = scannerWithMetaIndexA;
-      } else {
-        // @ts-ignore
-        scannerA = scannerWithMetaA;
-        scannerB = scannerWithMetaB;
-        scannerIndexA = scannerWithMetaIndexA;
-        scannerIndexB = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
+  const alignedScannersQueue = [{
+    points: scanners[0],
+    index: 0,
+  }];
+
+  while (alignedScannersQueue.length) {
+    const alignedScanner = alignedScannersQueue.shift();
+    // @ts-ignore
+    if (parsedScanners.find(item => item.index === alignedScanner.index)) {
+      continue;
+    }
+    parsedScanners.push(alignedScanner);
+    for (let indexB = 0; indexB < scanners.length; indexB++) {
+      // @ts-ignore
+      if (alignedScanner.index === indexB) {
+        continue;
       }
-
+      // @ts-ignore
+      if (pairs.find(item => item.indexA === indexB && item.indexB === alignedScanner.index)) {
+        continue;
+      }
+      // @ts-ignore
+      const pointsA = alignedScanner.points;
+      const pointsB = scanners[indexB];
 
       transformers.forEach(transformer => {
-        const sharedPoints = commonPointsForTransform(scannerA.scanner, scannerB.scanner, transformer);
-        const points = sharedPoints.commonPoints;
+        const transformResult = commonPointsForTransform(pointsA, pointsB, transformer);
+        const commonPoints = transformResult.commonPoints;
 
-        if (points.length >= 12 && (points[0][0] === points[points.length - 1][0])) {
-          if (!scannerWithMetaB.aligned) {
-            scannersWithMeta[scannerWithMetaIndexB] = {
-              scanner: sharedPoints.alignedB,
-              aligned: true,
-            };
-          }
-          commonPoints.push({
-            scannerIndexA,
-            scannerIndexB,
-          // @ts-ignore
-            scannerA,
+        if (commonPoints.length >= 12 && (commonPoints[0][0] === commonPoints[commonPoints.length - 1][0])) {
+          alignedScannersQueue.push({
+            points: transformResult.alignedB,
+            index: indexB,
+          });
+          pairs.push({
             // @ts-ignore
-            scannerB: {
-              scanner: sharedPoints.alignedB,
-              aligned: true,
-            },
-            sharedPoints: sharedPoints.commonPoints
+            indexA: alignedScanner.index,
+            indexB,
+            offset: commonPoints[0][0],
           });
         }
       });
-
-    });
-    scannerWithMetaIndexA++;
+    }
   }
 
-  const result = commonPoints.sort((a, b) => {
-    return (a.scannerIndexA + a.scannerIndexB) - (b.scannerIndexA + b.scannerIndexB);
-  });
 
+  console.log(pairs);
+
+  /*
   const scannerOffsets = [[0, 0, 0]];
   result.forEach(pair => {
     console.log(pair);
@@ -134,6 +115,7 @@ const day191 = function day191(data: Buffer) {
   const beaconsAsStrings = adjustedBeacons.flat().map(item => item.join(','));
 
   return [...new Set(beaconsAsStrings)].length;
+*/
 }
 
 export default day191;
