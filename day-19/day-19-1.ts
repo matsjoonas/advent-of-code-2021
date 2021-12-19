@@ -11,7 +11,7 @@ const day191 = function day191(data: Buffer) {
     if (line.includes('--- scanner')) {
       scannerIndex++;
     } else if (line !== '') {
-      if (!scanners[scannerIndex]){
+      if (!scanners[scannerIndex]) {
         scanners[scannerIndex] = [];
       }
       scanners[scannerIndex].push(line.split(',').map(Number))
@@ -19,25 +19,58 @@ const day191 = function day191(data: Buffer) {
   });
 
   const commonPoints: { scannerIndexA: number; scannerIndexB: number; sharedPoints: string[][]; }[] = [];
+  const scannersWithMeta = scanners.map((scanner, index) => ({
+    scanner,
+    aligned: index === 0,
+  }));
 
-  let scannerIndexA = 0;
-  while (scanners.length > 1) {
-    const scannerA = scanners.shift() || [];
-    scanners.forEach((scannerB, scannerIndexB) => {
+  let scannerWithMetaIndexA = 0;
+  while (scannersWithMeta.length > 1) {
+    const scannerWithMetaA = scannersWithMeta.shift();
+
+    scannersWithMeta.forEach((scannerWithMetaB, scannerWithMetaIndexB) => {
+      let scannerA: number[][];
+      let scannerB: number[][];
+      let scannerIndexA: number;
+      let scannerIndexB: number;
+      // @ts-ignore
+
+      if (scannerWithMetaA.aligned) {
+        // @ts-ignore
+        scannerA = scannerWithMetaA.scanner;
+        scannerB = scannerWithMetaB.scanner;
+        scannerIndexA = scannerWithMetaIndexA;
+        scannerIndexB = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
+      } else if (scannerWithMetaB.aligned) {
+        scannerA = scannerWithMetaB.scanner;
+        // @ts-ignore
+        scannerB = scannerWithMetaA.scanner;
+        scannerIndexA = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
+        scannerIndexB = scannerWithMetaIndexA;
+      }
+
+
       transformers.forEach(transformer => {
         const sharedPoints = commonPointsForTransform(scannerA, scannerB, transformer);
         const points = sharedPoints.commonPoints;
+
         if (points.length >= 12 && (points[0][0] === points[points.length - 1][0])) {
-          scanners[scannerIndexB] = sharedPoints.alignedB;
+          if (!scannerWithMetaB.aligned) {
+            scannersWithMeta[scannerWithMetaIndexB] = {
+              scanner: sharedPoints.alignedB,
+              aligned: true,
+            };
+          }
           commonPoints.push({
             scannerIndexA,
-            scannerIndexB: scannerIndexA + scannerIndexB + 1,
+            scannerIndexB,
             sharedPoints: sharedPoints.commonPoints
           });
         }
       });
+
     });
-    scannerIndexA++;
+    scannerWithMetaIndexA++;
   }
 
   const result = commonPoints;
