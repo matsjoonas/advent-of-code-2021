@@ -18,7 +18,10 @@ const day191 = function day191(data: Buffer) {
     }
   });
 
-  const commonPoints: { scannerIndexA: number; scannerIndexB: number; sharedPoints: string[][]; }[] = [];
+  const commonPoints: {
+    scannerA: any;
+    scannerB: any;
+    scannerIndexA: number; scannerIndexB: number; sharedPoints: string[][]; }[] = [];
   const scannersWithMeta = scanners.map((scanner, index) => ({
     scanner,
     aligned: index === 0,
@@ -29,29 +32,35 @@ const day191 = function day191(data: Buffer) {
     const scannerWithMetaA = scannersWithMeta.shift();
 
     scannersWithMeta.forEach((scannerWithMetaB, scannerWithMetaIndexB) => {
-      let scannerA: number[][];
-      let scannerB: number[][];
+      let scannerA: { scanner: number[][]; aligned: boolean };
+      let scannerB: { scanner: number[][]; aligned: boolean };
       let scannerIndexA: number;
       let scannerIndexB: number;
       // @ts-ignore
 
       if (scannerWithMetaA.aligned) {
         // @ts-ignore
-        scannerA = scannerWithMetaA.scanner;
-        scannerB = scannerWithMetaB.scanner;
+        scannerA = scannerWithMetaA;
+        scannerB = scannerWithMetaB;
         scannerIndexA = scannerWithMetaIndexA;
         scannerIndexB = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
       } else if (scannerWithMetaB.aligned) {
-        scannerA = scannerWithMetaB.scanner;
+        scannerA = scannerWithMetaB;
         // @ts-ignore
-        scannerB = scannerWithMetaA.scanner;
+        scannerB = scannerWithMetaA;
         scannerIndexA = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
         scannerIndexB = scannerWithMetaIndexA;
+      } else {
+        // @ts-ignore
+        scannerA = scannerWithMetaA;
+        scannerB = scannerWithMetaB;
+        scannerIndexA = scannerWithMetaIndexA;
+        scannerIndexB = scannerWithMetaIndexA + scannerWithMetaIndexB + 1;
       }
 
 
       transformers.forEach(transformer => {
-        const sharedPoints = commonPointsForTransform(scannerA, scannerB, transformer);
+        const sharedPoints = commonPointsForTransform(scannerA.scanner, scannerB.scanner, transformer);
         const points = sharedPoints.commonPoints;
 
         if (points.length >= 12 && (points[0][0] === points[points.length - 1][0])) {
@@ -64,6 +73,13 @@ const day191 = function day191(data: Buffer) {
           commonPoints.push({
             scannerIndexA,
             scannerIndexB,
+          // @ts-ignore
+            scannerA,
+            // @ts-ignore
+            scannerB: {
+              scanner: sharedPoints.alignedB,
+              aligned: true,
+            },
             sharedPoints: sharedPoints.commonPoints
           });
         }
@@ -73,7 +89,9 @@ const day191 = function day191(data: Buffer) {
     scannerWithMetaIndexA++;
   }
 
-  const result = commonPoints;
+  const result = commonPoints.sort((a, b) => {
+    return (a.scannerIndexA + a.scannerIndexB) - (b.scannerIndexA + b.scannerIndexB);
+  });
 
   const scannerOffsets = [[0, 0, 0]];
   result.forEach(pair => {
@@ -90,16 +108,32 @@ const day191 = function day191(data: Buffer) {
       searchingOffsetIndex = indexA;
     }
 
+    console.log(scannerOffsets);
+    console.log(foundOffsetIndex);
     const scannerOffset = scannerOffsets[foundOffsetIndex];
     const relativeOffsets = pair.sharedPoints[0][0].split(',').map(Number);
 
     scannerOffsets[searchingOffsetIndex] = [scannerOffset[0] + relativeOffsets[0], scannerOffset[1] + relativeOffsets[1], scannerOffset[2] + relativeOffsets[2]];
-    console.log(scannerOffsets);
   });
 
-  console.log(scannerOffsets);
+  const alignedScanners: any[] = [];
+  result.forEach(item => {
+    if (!alignedScanners[item.scannerIndexA]) {
+      alignedScanners[item.scannerIndexA] = item.scannerA.scanner;
+    }
+    if (!alignedScanners[item.scannerIndexB]) {
+      alignedScanners[item.scannerIndexB] = item.scannerB.scanner;
+    }
+  });
 
-  return null;
+  const adjustedBeacons = alignedScanners.map((beacons, index) => {
+    const currentOffset = scannerOffsets[index];
+    return beacons.map((beacon: number[]) => [beacon[0] + currentOffset[0], beacon[1] + currentOffset[1], beacon[2] + currentOffset[2]]);
+  });
+
+  const beaconsAsStrings = adjustedBeacons.flat().map(item => item.join(','));
+
+  return [...new Set(beaconsAsStrings)].length;
 }
 
 export default day191;
