@@ -18,31 +18,31 @@ const day191 = function day191(data: Buffer) {
     }
   });
 
-  const testResult = commonPointsForTransform(scanners[0], scanners[1], transformers[5]);
-  console.log(testResult);
-  console.log(testResult.length);
-  return;
+  const commonPoints: { scannerIndexA: number; scannerIndexB: number; sharedPoints: string[][]; }[] = [];
 
-  const commonPoints: string[][][] = [];
-
+  let scannerIndexA = 0;
   while (scanners.length > 1) {
     const scannerA = scanners.shift() || [];
-    scanners.forEach(scannerB => {
+    scanners.forEach((scannerB, scannerIndexB) => {
       transformers.forEach(transformer => {
         const sharedPoints = commonPointsForTransform(scannerA, scannerB, transformer);
         if (sharedPoints.length) {
-          commonPoints.push(sharedPoints);
+          commonPoints.push({
+            scannerIndexA,
+            scannerIndexB: scannerIndexA + scannerIndexB + 1,
+            sharedPoints,
+          });
         }
       });
     });
+    scannerIndexA++;
   }
 
   const result = commonPoints.filter(field => {
-    return field.length >= 12;
+    return field.sharedPoints.length >= 12 && (field.sharedPoints[0][0] === field.sharedPoints[field.sharedPoints.length - 1][0]);
   });
-  console.log(commonPoints);
-  console.log(result);
 
+  console.log(result);
 
   return null;
 }
