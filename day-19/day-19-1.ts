@@ -26,11 +26,13 @@ const day191 = function day191(data: Buffer) {
     scanners.forEach((scannerB, scannerIndexB) => {
       transformers.forEach(transformer => {
         const sharedPoints = commonPointsForTransform(scannerA, scannerB, transformer);
-        if (sharedPoints.length) {
+        const points = sharedPoints.commonPoints;
+        if (points.length >= 12 && (points[0][0] === points[points.length - 1][0])) {
+          scanners[scannerIndexB] = sharedPoints.alignedB;
           commonPoints.push({
             scannerIndexA,
             scannerIndexB: scannerIndexA + scannerIndexB + 1,
-            sharedPoints,
+            sharedPoints: sharedPoints.commonPoints
           });
         }
       });
@@ -38,11 +40,31 @@ const day191 = function day191(data: Buffer) {
     scannerIndexA++;
   }
 
-  const result = commonPoints.filter(field => {
-    return field.sharedPoints.length >= 12 && (field.sharedPoints[0][0] === field.sharedPoints[field.sharedPoints.length - 1][0]);
+  const result = commonPoints;
+
+  const scannerOffsets = [[0, 0, 0]];
+  result.forEach(pair => {
+    console.log(pair);
+    const indexA = pair.scannerIndexA;
+    const indexB = pair.scannerIndexB;
+    let foundOffsetIndex;
+    let searchingOffsetIndex;
+    if (scannerOffsets[indexA]) {
+      foundOffsetIndex = indexA;
+      searchingOffsetIndex = indexB;
+    } else {
+      foundOffsetIndex = indexB;
+      searchingOffsetIndex = indexA;
+    }
+
+    const scannerOffset = scannerOffsets[foundOffsetIndex];
+    const relativeOffsets = pair.sharedPoints[0][0].split(',').map(Number);
+
+    scannerOffsets[searchingOffsetIndex] = [scannerOffset[0] + relativeOffsets[0], scannerOffset[1] + relativeOffsets[1], scannerOffset[2] + relativeOffsets[2]];
+    console.log(scannerOffsets);
   });
 
-  console.log(result);
+  console.log(scannerOffsets);
 
   return null;
 }

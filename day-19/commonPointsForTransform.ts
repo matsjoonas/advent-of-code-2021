@@ -2,7 +2,7 @@ const commonPointsForTransform = function commonPointsForTransform(pointsA: numb
   const distances: string[][][] = [];
   // @ts-ignore
   const transPointsB = pointsB.map((point: [number, number, number]) => transformerFn(point));
-  
+
   pointsA.forEach((pointA, indexA) => {
     if (!distances[indexA]) {
       distances[indexA] = [];
@@ -32,7 +32,10 @@ const commonPointsForTransform = function commonPointsForTransform(pointsA: numb
   }
 
   const result = [...new Set(matches.map(item => item.join('|')))];
-  return result.map(line => line.split('|'));
+  return {
+    alignedB: transPointsB,
+    commonPoints: result.map(line => line.split('|')),
+  }
 }
 
 export default commonPointsForTransform;
