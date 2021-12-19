@@ -71,51 +71,33 @@ const day191 = function day191(data: Buffer) {
   }
 
 
-  console.log(pairs);
-
-  /*
   const scannerOffsets = [[0, 0, 0]];
-  result.forEach(pair => {
-    console.log(pair);
-    const indexA = pair.scannerIndexA;
-    const indexB = pair.scannerIndexB;
-    let foundOffsetIndex;
-    let searchingOffsetIndex;
-    if (scannerOffsets[indexA]) {
-      foundOffsetIndex = indexA;
-      searchingOffsetIndex = indexB;
-    } else {
-      foundOffsetIndex = indexB;
-      searchingOffsetIndex = indexA;
-    }
+  while(pairs.length) {
+    const currentPair = pairs.shift();
+    // @ts-ignore
+    const pairOffset = currentPair.offset.split(',').map(Number);
+    // @ts-ignore
+    const offsetFrom0A = scannerOffsets[currentPair.indexA];
+    const offsetFrom0B = [offsetFrom0A[0] + pairOffset[0], offsetFrom0A[1] + pairOffset[1], offsetFrom0A[2] + pairOffset[2]];
+    // @ts-ignore
+    scannerOffsets[currentPair.indexB] = offsetFrom0B;
+  }
 
-    console.log(scannerOffsets);
-    console.log(foundOffsetIndex);
-    const scannerOffset = scannerOffsets[foundOffsetIndex];
-    const relativeOffsets = pair.sharedPoints[0][0].split(',').map(Number);
-
-    scannerOffsets[searchingOffsetIndex] = [scannerOffset[0] + relativeOffsets[0], scannerOffset[1] + relativeOffsets[1], scannerOffset[2] + relativeOffsets[2]];
+  const pointsFrom0 = parsedScanners.map(scanner => {
+    // @ts-ignore
+    const currentPoints = scanner.points;
+    // @ts-ignore
+    const currentIndex = scanner.index;
+    const offsets = scannerOffsets[currentIndex];
+    return currentPoints.map(point => {
+      return [point[0] + offsets[0], point[1] + offsets[1], point[2] + offsets[2]];
+    });
   });
 
-  const alignedScanners: any[] = [];
-  result.forEach(item => {
-    if (!alignedScanners[item.scannerIndexA]) {
-      alignedScanners[item.scannerIndexA] = item.scannerA.scanner;
-    }
-    if (!alignedScanners[item.scannerIndexB]) {
-      alignedScanners[item.scannerIndexB] = item.scannerB.scanner;
-    }
-  });
+  const pointsFrom0Str = pointsFrom0.flat().map(item => item.join(','));
+  const uniquePointsFrom0 = [...new Set(pointsFrom0Str)];
 
-  const adjustedBeacons = alignedScanners.map((beacons, index) => {
-    const currentOffset = scannerOffsets[index];
-    return beacons.map((beacon: number[]) => [beacon[0] + currentOffset[0], beacon[1] + currentOffset[1], beacon[2] + currentOffset[2]]);
-  });
-
-  const beaconsAsStrings = adjustedBeacons.flat().map(item => item.join(','));
-
-  return [...new Set(beaconsAsStrings)].length;
-*/
+  return uniquePointsFrom0.length;
 }
 
 export default day191;
