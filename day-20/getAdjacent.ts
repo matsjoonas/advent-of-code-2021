@@ -1,4 +1,4 @@
-const getAdjacent = function getAdjacent(grid: (number)[][], x: number, y: number) {
+const getAdjacent = function getAdjacent(grid: string[][], x: number, y: number, emptyValue: string) {
   const adjPoints = [
     [x - 1, y - 1],
     [x, y - 1],
@@ -11,9 +11,9 @@ const getAdjacent = function getAdjacent(grid: (number)[][], x: number, y: numbe
     [x + 1, y + 1],
   ];
 
-  return adjPoints.reduce((acc, point) => {
+  return adjPoints.reduce((acc: string[], point) => {
     const row = grid[point[1]] || [];
-    const value = row[point[0]] || 0;
+    const value = row[point[0]] || emptyValue;
     acc.push(value);
     return acc;
   }, []);
