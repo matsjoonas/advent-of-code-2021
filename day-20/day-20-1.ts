@@ -22,12 +22,24 @@ const day121 = function day121(data: Buffer) {
       return '0';
     });
   });
+  //console.log(inputImage.map(item => item.join('')));
 
   let enhancedImage = inputImage;
-  for (let i = 0; i < 2; i++) {
-    const paddedImage = [...padGrid(enhancedImage, '0')];
+  for (let i = 0; i < 1; i++) {
+    let paddedImage = [...padGrid(enhancedImage, '0')];
+
+    // @ts-ignore
     enhancedImage = mapGrid(paddedImage, (item: any, x: number, y: number) => {
       const adj = getAdjacent(paddedImage, x, y,  '0');
+      const enhancementIndex = parseInt(adj.join(''), 2);
+      return enhancementAlgo[enhancementIndex];
+    });
+
+    paddedImage = [...padGrid(enhancedImage, '1')];
+
+    // @ts-ignore
+    enhancedImage = mapGrid(paddedImage, (item: any, x: number, y: number) => {
+      const adj = getAdjacent(paddedImage, x, y,  '1');
       const enhancementIndex = parseInt(adj.join(''), 2);
       return enhancementAlgo[enhancementIndex];
     });
