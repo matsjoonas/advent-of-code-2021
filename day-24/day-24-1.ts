@@ -63,10 +63,11 @@ class Alu {
   }
 
 
-  public run(input: number) {
+  public run(input: number[]) {
     this.program.forEach(instruction => {
+      const currentInput = input.shift();
       // @ts-ignore
-      this[instruction[0]](instruction[1], instruction[2] || input)
+      this[instruction[0]](instruction[1], instruction[2] || currentInput)
     });
   }
 }
@@ -76,7 +77,7 @@ const day241 = function day241(data: Buffer) {
     .split('\r\n').map(line => line.split(' ').map(tryConvertToNumber));
 
   const alu = new Alu(input);
-  alu.run(15);
+  alu.run([1, 3]);
   console.log(alu.getState());
 
   return null;
